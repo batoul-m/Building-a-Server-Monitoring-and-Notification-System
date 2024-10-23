@@ -7,6 +7,7 @@ namespace MonitoringApp.Services.MessageProcessingService
         private readonly IMongoCollection<ServerStatistics> _statisticsCollection;
         private readonly string _rabbitMqHost;
         private readonly string _mongoDbHost;
+        private readonly IAlertService _alertService;
         // Use Environment Variables
         public MessageProcessingService()
         {
@@ -31,7 +32,8 @@ namespace MonitoringApp.Services.MessageProcessingService
 
             if (memoryAnomaly || cpuAnomaly)
             {
-                //send alert 
+                string alertMessage = $"Anomaly detected! Memory: {current.MemoryUsage}, CPU: {current.CpuUsage}";
+                _alertService.SendAlert(alertMessage);
             }
         }
         public void DetectHighUsageAlert(ServerStatistics current, double memoryUsageThresholdPercentage, double cpuUsageThresholdPercentage)
@@ -40,7 +42,8 @@ namespace MonitoringApp.Services.MessageProcessingService
             bool cpuHighUsageAlert = (current.CpuUsage) > cpuUsageThresholdPercentage;
             if (memoryHighUsageAlert || cpuHighUsageAlert)
             {
-                //send alert
+                string alertMessage = $"High usage alert! Memory: {current.MemoryUsage}, CPU: {current.CpuUsage}";
+                _alertService.SendAlert(alertMessage);
             }
         }
     }
