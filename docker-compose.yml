@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  server-statistics:
+    build: .
+    environment:
+      SAMPLING_INTERVAL: 60
+      SERVER_IDENTIFIER: "linux1"
+
+  message-processing:
+    build: .
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      MONGODB_HOST: mongodb
+
+  signalr-consumer:
+    build: .
+    environment:
+      SIGNALR_URL: "http://your-signalr-url"
