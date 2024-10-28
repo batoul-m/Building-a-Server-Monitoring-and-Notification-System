@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Configuration;
+
 namespace MonitoringApp.Services.ServerStatisticsCollectionService
 {
     public class ServerStatisticsService : IServerStatisticsService
@@ -13,7 +14,7 @@ namespace MonitoringApp.Services.ServerStatisticsCollectionService
             _samplingIntervalSeconds = int.Parse(ConfigurationManager.AppSettings["SAMPLING_INTERVAL"] ?? "60");
             _serverIdentifier = ConfigurationManager.AppSettings["SERVER_IDENTIFIER"] ?? "default_server";
         }
-        
+
         public ServerStatisticsService(int samplingIntervalSeconds, string serverIdentifier)
         {
             _samplingIntervalSeconds = samplingIntervalSeconds;
