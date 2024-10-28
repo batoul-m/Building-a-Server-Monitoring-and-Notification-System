@@ -1,5 +1,7 @@
+using System.Configuration;
 using MongoDB.Driver;
 using MonitoringApp.Services.ServerStatisticsCollectionService;
+
 namespace MonitoringApp.Services.MessageProcessingService
 {
     public class MessageProcessingService : IMessageProcessingService
@@ -8,23 +10,24 @@ namespace MonitoringApp.Services.MessageProcessingService
         private readonly string _rabbitMqHost;
         private readonly string _mongoDbHost;
         private readonly IAlertService _alertService;
-        // Use Environment Variables
-        public MessageProcessingService()
-        {
-            _rabbitMqHost = Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? "localhost";
-            _mongoDbHost = Environment.GetEnvironmentVariable("MONGODB_HOST") ?? "localhost";
-        }
 
-        public MessageProcessingService(string connectionString, string databaseName)
+        // Constructor with configuration loaded from AppSettings
+         public MessageProcessingService(IAlertService alertService, string databaseName)
         {
-            var client = new MongoClient(connectionString);
-            var database = client.GetDatabase(databaseName);
+            _rabbitMqHost = ConfigurationManager.AppSettings["RABBITMQ_HOST"] ?? "localhost";
+            _mongoDbHost = ConfigurationManager.AppSettings["MONGODB_HOST"] ?? "localhost";
+            _alertService = alertService ?? throw new ArgumentNullException(nameof(alertService));
+
+            var client = new MongoClient(_mongoDbHost);
+            var database = client.GetDatabase(databaseName); 
             _statisticsCollection = database.GetCollection<ServerStatistics>("server_statistics");
         }
+
         public void ProcessMessage(ServerStatistics statistics)
         {
             _statisticsCollection.InsertOne(statistics);
         }
+
         void IMessageProcessingService.DetectAnomalies(ServerStatistics current, ServerStatistics previous, double memoryThreshold, double cpuThreshold)
         {
             bool memoryAnomaly = current.MemoryUsage > (previous.MemoryUsage * (1 + memoryThreshold));
@@ -36,6 +39,7 @@ namespace MonitoringApp.Services.MessageProcessingService
                 _alertService.SendAlert(alertMessage);
             }
         }
+
         public void DetectHighUsageAlert(ServerStatistics current, double memoryUsageThresholdPercentage, double cpuUsageThresholdPercentage)
         {
             bool memoryHighUsageAlert = (current.MemoryUsage / (current.MemoryUsage + current.AvailableMemory)) > memoryUsageThresholdPercentage;

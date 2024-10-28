@@ -1,6 +1,6 @@
 using RabbitMQ.Client;
-using System;
 using System.Text;
+
 namespace MonitoringApp.Utilities.ReusableRabbitMQClientLibrary
 {
     public class RabbitMQMessagePublisher : IMessagePublisher

@@ -4,6 +4,4 @@ namespace MonitoringApp.Utilities.ReusableRabbitMQClientLibrary
     {
         void Consume(string queueName, Action<byte[]> handleMessage);
     }
-
-
 }

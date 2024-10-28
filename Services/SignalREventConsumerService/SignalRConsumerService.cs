@@ -1,14 +1,17 @@
+using System.Configuration;
 using Microsoft.AspNetCore.SignalR.Client;
+
 namespace MonitoringApp.Services.SignalRConsumerService
 {
     public class SignalRConsumerService : ISignalRConsumerService
     {
         private HubConnection _connection;
         private string _signalRUrl;
-        // Use Environment variable
+        
+        // Constructor with configuration loaded from AppSettings
         public SignalRConsumerService()
         {
-            _signalRUrl = Environment.GetEnvironmentVariable("SIGNALR_URL") ?? "http://localhost:5000";
+            _signalRUrl = ConfigurationManager.AppSettings["SIGNALR_URL"] ?? "http://localhost:5000";
         }
 
         public async Task Connect(string signalRUrl)
@@ -25,6 +28,7 @@ namespace MonitoringApp.Services.SignalRConsumerService
 
             await _connection.StartAsync();
         }
+
         public async Task Disconnect()
         {
             await _connection.StopAsync();  
